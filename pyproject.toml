@@ -1,0 +1,16 @@
+[project]
+name = "helwan-rag-qa-eval"
+version = "0.1.0"
+description = "Retrieval-Augmented Generation (RAG) QA and Evaluation pipeline for Helwan National University regulations."
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
