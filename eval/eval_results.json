@@ -1,0 +1,1237 @@
+{
+  "metadata": {
+    "timestamp_utc": "2026-11-20T20:36:12.840778+00:00",
+    "dataset_path": "eval\\test_dataset.json",
+    "chroma_dir": "chroma_db",
+    "collection_name": "helwan_regulations",
+    "embedding_model": "intfloat/multilingual-e5-base",
+    "llm_provider": "gemini",
+    "llm_model": "gemini-2.5-flash",
+    "top_k": 5,
+    "retrieval_only": false,
+    "judge_mode": "auto",
+    "total_questions": 24
+  },
+  "summary": {
+    "overall": {
+      "count": 24,
+      "answerable_count": 18,
+      "unanswerable_count": 6,
+      "recall_at_k": 0.8981,
+      "mrr": 0.9167,
+      "faithfulness": 0.0,
+      "answer_accuracy": 0.0,
+      "citation_quality": 0.0,
+      "abstention_accuracy": 0.0
+    },
+    "by_category": {
+      "direct_factual": {
+        "count": 6,
+        "answerable_count": 6,
+        "unanswerable_count": 0,
+        "recall_at_k": 1.0,
+        "mrr": 0.9167,
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_accuracy": null
+      },
+      "multi_hop": {
+        "count": 6,
+        "answerable_count": 6,
+        "unanswerable_count": 0,
+        "recall_at_k": 0.7778,
+        "mrr": 0.8333,
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_accuracy": null
+      },
+      "tabular_numerical": {
+        "count": 6,
+        "answerable_count": 6,
+        "unanswerable_count": 0,
+        "recall_at_k": 0.9167,
+        "mrr": 1.0,
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_accuracy": null
+      },
+      "unanswerable": {
+        "count": 6,
+        "answerable_count": 0,
+        "unanswerable_count": 6,
+        "recall_at_k": null,
+        "mrr": null,
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_accuracy": 0.0
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "q01",
+      "category": "direct_factual",
+      "language": "ar",
+      "answerable": true,
+      "question": "ما الدرجة العلمية التي تمنحها جامعة حلوان الأهلية للخريجين من هذا البرنامج؟",
+      "expected_pages": [
+        6
+      ],
+      "expected_chunks": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p006::c001"
+      ],
+      "retrieved_pages": [
+        6,
+        2,
+        3,
+        1,
+        9
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p006::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p002::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p003::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p001::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p009::c001"
+      ],
+      "retrieved_scores": [
+        0.8711,
+        0.8633,
+        0.8475,
+        0.8464,
+        0.846
+      ],
+      "top_similarity": 0.8711,
+      "recall_at_k": 1.0,
+      "mrr": 1.0,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q02",
+      "category": "direct_factual",
+      "language": "ar",
+      "answerable": true,
+      "question": "ما هي نسبة الحضور المطلوبة لدخول الامتحان النهائي، وماذا يحدث إذا تجاوزت نسبة غياب الطالب الحد المسموح به بدون عذر مقبول؟",
+      "expected_pages": [
+        8
+      ],
+      "expected_chunks": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c005",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c006"
+      ],
+      "retrieved_pages": [
+        8,
+        10,
+        8,
+        8,
+        7
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c006",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c005",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c007",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c006"
+      ],
+      "retrieved_scores": [
+        0.8885,
+        0.8656,
+        0.8479,
+        0.8469,
+        0.8372
+      ],
+      "top_similarity": 0.8885,
+      "recall_at_k": 1.0,
+      "mrr": 1.0,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q03",
+      "category": "direct_factual",
+      "language": "ar",
+      "answerable": true,
+      "question": "ما المدة المسموح بها لتقديم التماس مراجعة درجات المقرر، وكم يبلغ زمن الامتحان النهائي التحريري؟",
+      "expected_pages": [
+        9
+      ],
+      "expected_chunks": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p009::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p009::c003"
+      ],
+      "retrieved_pages": [
+        9,
+        9,
+        12,
+        11,
+        7
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p009::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p009::c003",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p011::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c005"
+      ],
+      "retrieved_scores": [
+        0.8592,
+        0.8583,
+        0.8343,
+        0.8226,
+        0.8225
+      ],
+      "top_similarity": 0.8592,
+      "recall_at_k": 1.0,
+      "mrr": 1.0,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q04",
+      "category": "direct_factual",
+      "language": "ar",
+      "answerable": true,
+      "question": "ما شروط منح الطالب مرتبة الشرف عند التخرج؟",
+      "expected_pages": [
+        11
+      ],
+      "expected_chunks": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p011::c002"
+      ],
+      "retrieved_pages": [
+        11,
+        12,
+        7,
+        8,
+        12
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p011::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c006",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c006",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c006",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c003"
+      ],
+      "retrieved_scores": [
+        0.8449,
+        0.8257,
+        0.821,
+        0.82,
+        0.818
+      ],
+      "top_similarity": 0.8449,
+      "recall_at_k": 1.0,
+      "mrr": 1.0,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q05",
+      "category": "direct_factual",
+      "language": "ar",
+      "answerable": true,
+      "question": "ما الحد الأقصى لمدة تأجيل الدراسة، وهل تُحتسب مدة التأجيل ضمن المدة المسموح بها للحصول على البكالوريوس؟",
+      "expected_pages": [
+        8
+      ],
+      "expected_chunks": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c002"
+      ],
+      "retrieved_pages": [
+        8,
+        8,
+        8,
+        7,
+        8
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c005",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c005",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c003"
+      ],
+      "retrieved_scores": [
+        0.8973,
+        0.8489,
+        0.8474,
+        0.847,
+        0.8429
+      ],
+      "top_similarity": 0.8973,
+      "recall_at_k": 1.0,
+      "mrr": 1.0,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q06",
+      "category": "direct_factual",
+      "language": "en",
+      "answerable": true,
+      "question": "What core topics are covered in the course ROB 404 (Mobile robots)?",
+      "expected_pages": [
+        46
+      ],
+      "expected_chunks": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p046::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p046::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p046::c003"
+      ],
+      "retrieved_pages": [
+        44,
+        46,
+        45,
+        46,
+        47
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p044::c003",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p046::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p045::c003",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p046::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p047::c004"
+      ],
+      "retrieved_scores": [
+        0.8594,
+        0.8583,
+        0.8485,
+        0.8479,
+        0.847
+      ],
+      "top_similarity": 0.8594,
+      "recall_at_k": 1.0,
+      "mrr": 0.5,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q07",
+      "category": "multi_hop",
+      "language": "ar",
+      "answerable": true,
+      "question": "طالب معدله التراكمي CGPA في بداية الفصل الدراسي يساوي 1.8، ما الحد الأقصى للساعات المعتمدة التي يمكنه تسجيلها، وهل يُوجه له إنذار أكاديمي، وما قواعد إعادة المقررات التي سبق نجاحه فيها لرفع معدله؟",
+      "expected_pages": [
+        7,
+        9,
+        11
+      ],
+      "expected_chunks": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c003",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p009::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p011::c005",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p011::c006"
+      ],
+      "retrieved_pages": [
+        11,
+        10,
+        12,
+        10,
+        7
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p011::c006",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c005",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c006"
+      ],
+      "retrieved_scores": [
+        0.8839,
+        0.8776,
+        0.869,
+        0.8685,
+        0.8674
+      ],
+      "top_similarity": 0.8839,
+      "recall_at_k": 0.6667,
+      "mrr": 1.0,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q08",
+      "category": "multi_hop",
+      "language": "ar",
+      "answerable": true,
+      "question": "حتى أي أسبوع دراسي يمكن للطالب الانسحاب من مقرر بتقدير W بدون عذر قهري، وما الحد الأدنى للساعات الذي يجب الالتزام به بعد الانسحاب؟",
+      "expected_pages": [
+        7
+      ],
+      "expected_chunks": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c005",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c006"
+      ],
+      "retrieved_pages": [
+        7,
+        7,
+        7,
+        10,
+        8
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c006",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c005",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c006"
+      ],
+      "retrieved_scores": [
+        0.8834,
+        0.86,
+        0.8563,
+        0.8561,
+        0.8414
+      ],
+      "top_similarity": 0.8834,
+      "recall_at_k": 1.0,
+      "mrr": 1.0,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q09",
+      "category": "multi_hop",
+      "language": "ar",
+      "answerable": true,
+      "question": "متى يحق للطالب التسجيل في التدريب الميداني، وكم عدد ساعاته وتوزيعها، وهل تدخل ساعاته ضمن الـ 138 ساعة معتمدة المطلوبة للتخرج والمعدل التراكمي؟",
+      "expected_pages": [
+        11,
+        12
+      ],
+      "expected_chunks": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p011::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p011::c003",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c004"
+      ],
+      "retrieved_pages": [
+        11,
+        12,
+        11,
+        19,
+        7
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p011::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p011::c003",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p019::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c006"
+      ],
+      "retrieved_scores": [
+        0.8584,
+        0.845,
+        0.844,
+        0.8435,
+        0.8302
+      ],
+      "top_similarity": 0.8584,
+      "recall_at_k": 1.0,
+      "mrr": 1.0,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q10",
+      "category": "multi_hop",
+      "language": "ar",
+      "answerable": true,
+      "question": "ما سلسلة المتطلبات السابقة الكاملة للوصول إلى مقرر الروبوتات المتنقلة (ROB 404) بدءاً من مقررات العلوم الأساسية والكلية؟",
+      "expected_pages": [
+        16,
+        18
+      ],
+      "expected_chunks": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p016::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p018::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p018::c003"
+      ],
+      "retrieved_pages": [
+        46,
+        44,
+        3,
+        46,
+        47
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p046::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p044::c003",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p003::c006",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p046::c003",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p047::c001"
+      ],
+      "retrieved_scores": [
+        0.8751,
+        0.8563,
+        0.854,
+        0.8516,
+        0.849
+      ],
+      "top_similarity": 0.8751,
+      "recall_at_k": 0.0,
+      "mrr": 0.0,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q11",
+      "category": "multi_hop",
+      "language": "ar",
+      "answerable": true,
+      "question": "خلال كم يوم يجب تقديم العذر القهري للحصول على تقدير غير مكتمل (I) في الامتحان النهائي، وما الاستثناء الممنوح للطالب في العبء الدراسي عند تسجيل هذا المقرر في الفصل التالي؟",
+      "expected_pages": [
+        7,
+        8
+      ],
+      "expected_chunks": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c006"
+      ],
+      "retrieved_pages": [
+        8,
+        8,
+        7,
+        10,
+        7
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c006",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c007",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c006",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c005"
+      ],
+      "retrieved_scores": [
+        0.8763,
+        0.8543,
+        0.8529,
+        0.8512,
+        0.8493
+      ],
+      "top_similarity": 0.8763,
+      "recall_at_k": 1.0,
+      "mrr": 1.0,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q12",
+      "category": "multi_hop",
+      "language": "ar",
+      "answerable": true,
+      "question": "ما الفرق في الحد الأقصى لعدد المقررات المسموح بإعادتها بين الطالب تحت الملاحظة الأكاديمية (CGPA أقل من 2) والطالب الذي يعيد مقررات نجح فيها للتحسين، وما السقف الأعلى للدرجة في الحالتين؟",
+      "expected_pages": [
+        11,
+        12
+      ],
+      "expected_chunks": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p011::c005",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p011::c006",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c002"
+      ],
+      "retrieved_pages": [
+        11,
+        12,
+        10,
+        12,
+        11
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p011::c006",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c005",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p011::c005"
+      ],
+      "retrieved_scores": [
+        0.8793,
+        0.8758,
+        0.8567,
+        0.8548,
+        0.853
+      ],
+      "top_similarity": 0.8793,
+      "recall_at_k": 1.0,
+      "mrr": 1.0,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q13",
+      "category": "tabular_numerical",
+      "language": "ar",
+      "answerable": true,
+      "question": "كم إجمالي الساعات المعتمدة اللازمة للتخرج، وما توزيعها بالساعات وعدد المقررات حسب جدول المادة (22)؟",
+      "expected_pages": [
+        12
+      ],
+      "expected_chunks": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c005",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c006"
+      ],
+      "retrieved_pages": [
+        12,
+        12,
+        7,
+        7,
+        10
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c005",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c006",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c005"
+      ],
+      "retrieved_scores": [
+        0.8543,
+        0.8537,
+        0.8479,
+        0.8445,
+        0.8427
+      ],
+      "top_similarity": 0.8543,
+      "recall_at_k": 1.0,
+      "mrr": 1.0,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q14",
+      "category": "tabular_numerical",
+      "language": "ar",
+      "answerable": true,
+      "question": "ما التقدير وعدد النقاط المقابل لنسبة 85% في جدول التقديرات، وما الحد الأدنى للنسبة والتقدير والنقاط للنجاح في المقرر؟",
+      "expected_pages": [
+        10
+      ],
+      "expected_chunks": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c002"
+      ],
+      "retrieved_pages": [
+        10,
+        10,
+        10,
+        9,
+        10
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c005",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p009::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c003"
+      ],
+      "retrieved_scores": [
+        0.8326,
+        0.8257,
+        0.823,
+        0.8206,
+        0.8204
+      ],
+      "top_similarity": 0.8326,
+      "recall_at_k": 1.0,
+      "mrr": 1.0,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q15",
+      "category": "tabular_numerical",
+      "language": "ar",
+      "answerable": true,
+      "question": "كيف يتدرج انتقال الطالب بين المستويات الدراسية الأربعة (Freshman و Sophomore و Junior و Senior) حسب نسبة الساعات المعتمدة المجتازة؟",
+      "expected_pages": [
+        10
+      ],
+      "expected_chunks": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c006"
+      ],
+      "retrieved_pages": [
+        10,
+        7,
+        6,
+        13,
+        12
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c006",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c006",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p006::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p013::c003",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c004"
+      ],
+      "retrieved_scores": [
+        0.9058,
+        0.8331,
+        0.8312,
+        0.8312,
+        0.8304
+      ],
+      "top_similarity": 0.9058,
+      "recall_at_k": 1.0,
+      "mrr": 1.0,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q16",
+      "category": "tabular_numerical",
+      "language": "ar",
+      "answerable": true,
+      "question": "ما الحد الأدنى والأقصى للساعات المعتمدة المسجلة في الفصل الدراسي العادي حسب المعدل التراكمي CGPA، وما مدة الفصل الصيفي والحد الأقصى لساعاته؟",
+      "expected_pages": [
+        7,
+        12
+      ],
+      "expected_chunks": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c003",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c007"
+      ],
+      "retrieved_pages": [
+        7,
+        10,
+        7,
+        10,
+        12
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c003",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c005",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c004"
+      ],
+      "retrieved_scores": [
+        0.8744,
+        0.8717,
+        0.868,
+        0.8595,
+        0.8571
+      ],
+      "top_similarity": 0.8744,
+      "recall_at_k": 1.0,
+      "mrr": 1.0,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q17",
+      "category": "tabular_numerical",
+      "language": "ar",
+      "answerable": true,
+      "question": "كم عدد الساعات المعتمدة وساعات العملي لمقرري مشروع التخرج (COM 400 و COM 498)، وما متطلبهما السابق، وكيف تُوزع درجات مقرر المشروع؟",
+      "expected_pages": [
+        9,
+        19
+      ],
+      "expected_chunks": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p009::c005",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p019::c003"
+      ],
+      "retrieved_pages": [
+        19,
+        12,
+        12,
+        7,
+        13
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p019::c003",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c005",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p013::c003"
+      ],
+      "retrieved_scores": [
+        0.8592,
+        0.854,
+        0.8395,
+        0.8378,
+        0.8377
+      ],
+      "top_similarity": 0.8592,
+      "recall_at_k": 0.5,
+      "mrr": 1.0,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q18",
+      "category": "tabular_numerical",
+      "language": "ar",
+      "answerable": true,
+      "question": "كيف تُقسم النهاية العظمى البالغة 100 درجة للمقرر الدراسي العادي، وما شرطا النجاح الرقميان في المجموع والامتحان التحريري؟",
+      "expected_pages": [
+        9
+      ],
+      "expected_chunks": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p009::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p009::c002"
+      ],
+      "retrieved_pages": [
+        9,
+        9,
+        8,
+        10,
+        10
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p009::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p009::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c007",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c005"
+      ],
+      "retrieved_scores": [
+        0.8586,
+        0.8446,
+        0.837,
+        0.8325,
+        0.8236
+      ],
+      "top_similarity": 0.8586,
+      "recall_at_k": 1.0,
+      "mrr": 1.0,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q19",
+      "category": "unanswerable",
+      "language": "ar",
+      "answerable": false,
+      "question": "ما قيمة المصروفات الدراسية السنوية بالجنيه المصري للالتحاق ببرنامج برمجيات الإنسان الآلي؟",
+      "expected_pages": [],
+      "expected_chunks": [],
+      "retrieved_pages": [
+        12,
+        3,
+        3,
+        3,
+        20
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p012::c003",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p003::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p003::c007",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p003::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p020::c001"
+      ],
+      "retrieved_scores": [
+        0.8596,
+        0.8454,
+        0.8399,
+        0.8381,
+        0.8336
+      ],
+      "top_similarity": 0.8596,
+      "recall_at_k": null,
+      "mrr": null,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q20",
+      "category": "unanswerable",
+      "language": "ar",
+      "answerable": false,
+      "question": "من هو عميد كلية علوم الحاسب وتكنولوجيا المعلومات الحالي أو منسق برنامج برمجيات الإنسان الآلي بالاسم؟",
+      "expected_pages": [],
+      "expected_chunks": [],
+      "retrieved_pages": [
+        3,
+        4,
+        8,
+        5,
+        20
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p003::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p004::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p005::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p020::c001"
+      ],
+      "retrieved_scores": [
+        0.8581,
+        0.8496,
+        0.8443,
+        0.8412,
+        0.8328
+      ],
+      "top_similarity": 0.8581,
+      "recall_at_k": null,
+      "mrr": null,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q21",
+      "category": "unanswerable",
+      "language": "ar",
+      "answerable": false,
+      "question": "ما الحد الأدنى لمجموع القبول بالثانوية العامة للالتحاق بالكلية في العام الدراسي 2025/2026؟",
+      "expected_pages": [],
+      "expected_chunks": [],
+      "retrieved_pages": [
+        7,
+        7,
+        6,
+        8,
+        10
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c003",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p006::c007",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c008",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c002"
+      ],
+      "retrieved_scores": [
+        0.8225,
+        0.8225,
+        0.8204,
+        0.8185,
+        0.8176
+      ],
+      "top_similarity": 0.8225,
+      "recall_at_k": null,
+      "mrr": null,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q22",
+      "category": "unanswerable",
+      "language": "ar",
+      "answerable": false,
+      "question": "ما شروط التقديم والرسوم الخاصة بالسكن الجامعي أو المدينة الجامعية لطلاب جامعة حلوان الأهلية؟",
+      "expected_pages": [],
+      "expected_chunks": [],
+      "retrieved_pages": [
+        7,
+        2,
+        6,
+        13,
+        8
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p002::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p006::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p013::c001",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c001"
+      ],
+      "retrieved_scores": [
+        0.8313,
+        0.831,
+        0.8269,
+        0.8237,
+        0.8236
+      ],
+      "top_similarity": 0.8313,
+      "recall_at_k": null,
+      "mrr": null,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q23",
+      "category": "unanswerable",
+      "language": "ar",
+      "answerable": false,
+      "question": "في أي تاريخ ميلادي محدد تبدأ الدراسة وامتحانات نهاية الفصل الدراسي الأول للعام الجامعي القادم؟",
+      "expected_pages": [],
+      "expected_chunks": [],
+      "retrieved_pages": [
+        6,
+        8,
+        6,
+        7,
+        10
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p006::c005",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p008::c007",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p006::c006",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p007::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c006"
+      ],
+      "retrieved_scores": [
+        0.8235,
+        0.8193,
+        0.8154,
+        0.8137,
+        0.813
+      ],
+      "top_similarity": 0.8235,
+      "recall_at_k": null,
+      "mrr": null,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    },
+    {
+      "id": "q24",
+      "category": "unanswerable",
+      "language": "en",
+      "answerable": false,
+      "question": "What exact GPA threshold qualifies a student for a merit-based tuition scholarship discount at Helwan National University?",
+      "expected_pages": [],
+      "expected_chunks": [],
+      "retrieved_pages": [
+        42,
+        24,
+        23,
+        10,
+        19
+      ],
+      "retrieved_chunk_ids": [
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p042::c007",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p024::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p023::c004",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p010::c002",
+        "كلية الحاسبات وتكنولوجيا المعلومات - برنامج برمجيات الربوتات - الجامعة الاهلية.pdf::p019::c004"
+      ],
+      "retrieved_scores": [
+        0.7803,
+        0.7786,
+        0.7757,
+        0.7717,
+        0.7708
+      ],
+      "top_similarity": 0.7803,
+      "recall_at_k": null,
+      "mrr": null,
+      "generation": {
+        "answer": "",
+        "abstained": false,
+        "cited_pages": [],
+        "method": "error",
+        "faithfulness": 0.0,
+        "answer_accuracy": 0.0,
+        "citation_quality": 0.0,
+        "abstention_correct": false,
+        "rationale": "Generation error: Gemini generation failed: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).', 'status': 'NOT_FOUND'}}"
+      }
+    }
+  ]
+}

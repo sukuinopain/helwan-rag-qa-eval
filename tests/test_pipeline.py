@@ -7,13 +7,17 @@ from pathlib import Path
 
 import chromadb
 import pytest
+from chromadb.config import Settings
 
+from eval.generate_plots import generate_all_plots
 from eval.run_eval import compute_mrr, compute_recall_at_k, evaluate_with_rubric
 from src import DEFAULT_CHUNK_OVERLAP, DEFAULT_CHUNK_SIZE
 from src.generator import (
     ABSTENTION_PHRASE_AR,
     ABSTENTION_PHRASE_EN,
     ConfigurationError,
+    GeminiBackend,
+    GroqBackend,
     RAGGenerator,
     build_rag_prompts,
     create_llm_backend,
@@ -25,9 +29,10 @@ from src.ingestion import (
     chunk_documents,
     clean_extracted_text,
     detect_arabic_text_issues,
+    extract_chunk_metadata_cues,
     reconstruct_text_from_rawdict,
 )
-from src.retriever import ChromaRetriever, RetrievedChunk
+from src.retriever import ChromaRetriever, RetrievedChunk, normalize_and_expand_query
 
 
 class _FakeLLMBackend:
@@ -248,6 +253,7 @@ def test_prompts_citations_and_abstention_behavior(monkeypatch: pytest.MonkeyPat
     assert abst_res.citations == []
 
     # Missing keys raise ConfigurationError cleanly without hardcoded fallback.
+    monkeypatch.setattr("src.generator.load_dotenv", lambda *args, **kwargs: False)
     monkeypatch.delenv("LLM_PROVIDER", raising=False)
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     monkeypatch.delenv("GROQ_API_KEY", raising=False)
@@ -293,3 +299,291 @@ def test_eval_metrics_and_starter_dataset_schema() -> None:
     }
     ids = [item["id"] for item in items]
     assert len(ids) == len(set(ids))
+    for item in items:
+        assert isinstance(item.get("expected_chunks"), list)
+        if item["answerable"]:
+            assert len(item["expected_chunks"]) >= 1
+        else:
+            assert item["expected_chunks"] == []
+
+
+def test_generate_all_plots_writes_three_pngs(tmp_path: Path) -> None:
+    synthetic_report = {
+        "metadata": {
+            "top_k": 5,
+            "embedding_model": "intfloat/multilingual-e5-base",
+            "llm_provider": "gemini",
+            "llm_model": "gemini-2.5-flash",
+            "judge_mode": "auto",
+        },
+        "summary": {
+            "overall": {
+                "answerable_count": 3,
+                "recall_at_k": 0.85,
+                "mrr": 0.9,
+            },
+            "by_category": {
+                "direct_factual": {
+                    "recall_at_k": 1.0,
+                    "mrr": 1.0,
+                    "faithfulness": 0.95,
+                    "answer_accuracy": 0.9,
+                },
+                "multi_hop": {
+                    "recall_at_k": 0.75,
+                    "mrr": 0.8,
+                    "faithfulness": 0.85,
+                    "answer_accuracy": 0.8,
+                },
+                "tabular_numerical": {
+                    "recall_at_k": 0.8,
+                    "mrr": 0.9,
+                    "faithfulness": 0.9,
+                    "answer_accuracy": 0.85,
+                },
+                "unanswerable": {
+                    "faithfulness": 1.0,
+                    "answer_accuracy": 1.0,
+                    "abstention_accuracy": 1.0,
+                },
+            },
+        },
+        "results": [
+            {"id": "q01", "answerable": True, "top_similarity": 0.89},
+            {"id": "q14", "answerable": True, "top_similarity": 0.83},
+            {"id": "q19", "answerable": False, "top_similarity": 0.85},
+            {"id": "q24", "answerable": False, "top_similarity": 0.78},
+        ],
+    }
+    results_file = tmp_path / "eval_results.json"
+    results_file.write_text(json.dumps(synthetic_report), encoding="utf-8")
+
+    out_dir = tmp_path / "plots"
+    created = generate_all_plots(results_path=results_file, output_dir=out_dir)
+
+    assert len(created) == 3
+    for png_path in created:
+        assert png_path.exists()
+        assert png_path.suffix == ".png"
+        assert png_path.stat().st_size > 1000
+
+
+def test_runtime_api_key_and_env_fallback(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("src.generator.load_dotenv", lambda *args, **kwargs: False)
+    monkeypatch.setenv("LLM_PROVIDER", "gemini")
+    monkeypatch.setenv("GEMINI_API_KEY", "env-gemini-key")
+    monkeypatch.setenv("GEMINI_MODEL", "gemini-2.5-flash")
+    monkeypatch.setenv("GROQ_API_KEY", "env-groq-key")
+    monkeypatch.setenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+
+    # Runtime api_key and model_name override env vars for Gemini and Groq.
+    runtime_gemini = create_llm_backend(
+        provider="gemini",
+        api_key="ui-gemini-key",
+        model_name="custom-gemini-model",
+    )
+    assert isinstance(runtime_gemini, GeminiBackend)
+    assert runtime_gemini._api_key == "ui-gemini-key"
+    assert runtime_gemini.model_name == "custom-gemini-model"
+
+    runtime_groq = create_llm_backend(
+        provider="groq",
+        api_key="ui-groq-key",
+        model_name="custom-groq-model",
+    )
+    assert isinstance(runtime_groq, GroqBackend)
+    assert runtime_groq._api_key == "ui-groq-key"
+    assert runtime_groq.model_name == "custom-groq-model"
+
+    # Empty/whitespace runtime inputs cleanly fall back to environment variables.
+    env_gemini = create_llm_backend(provider="gemini", api_key="   ", model_name=" ")
+    assert isinstance(env_gemini, GeminiBackend)
+    assert env_gemini._api_key == "env-gemini-key"
+    assert env_gemini.model_name == "gemini-2.5-flash"
+
+    # RAGGenerator passes explicit api_key / model_name through and stays backward-compatible.
+    gen_gemini = RAGGenerator(
+        provider="gemini",
+        api_key="ui-session-gemini",
+        model_name="gemini-2.5-flash-runtime",
+    )
+    gemini_backend = gen_gemini._get_backend()
+    assert isinstance(gemini_backend, GeminiBackend)
+    assert gemini_backend._api_key == "ui-session-gemini"
+    assert gemini_backend.model_name == "gemini-2.5-flash-runtime"
+
+    gen_runtime = RAGGenerator(
+        provider="groq",
+        api_key="ui-session-groq",
+        model_name="mixtral-8x7b",
+    )
+    backend = gen_runtime._get_backend()
+    assert isinstance(backend, GroqBackend)
+    assert backend._api_key == "ui-session-groq"
+    assert backend.model_name == "mixtral-8x7b"
+
+    # Whitespace-only model_name falls back cleanly to legacy `model` argument.
+    gen_whitespace_fallback = RAGGenerator(
+        provider="gemini",
+        model="gemini-legacy-fallback",
+        model_name="   ",
+    )
+    assert gen_whitespace_fallback._get_backend().model_name == "gemini-legacy-fallback"
+
+    gen_legacy = RAGGenerator(provider="gemini", model="gemini-legacy-arg")
+    legacy_backend = gen_legacy._get_backend()
+    assert isinstance(legacy_backend, GeminiBackend)
+    assert legacy_backend._api_key == "env-gemini-key"
+    assert legacy_backend.model_name == "gemini-legacy-arg"
+
+    from app import _build_generator
+
+    app_gen = _build_generator(
+        provider="gemini",
+        model_name="gemini-2.5-flash",
+        api_key="ui-key",
+    )
+    app_backend = app_gen._get_backend()
+    assert isinstance(app_backend, GeminiBackend)
+    assert app_backend._api_key == "ui-key"
+    assert app_backend.model_name == "gemini-2.5-flash"
+
+
+def test_colloquial_and_level_query_normalization() -> None:
+    q_colloquial = "ايه مواد سنه تالته؟"
+    expanded = normalize_and_expand_query(q_colloquial)
+    assert expanded.startswith(q_colloquial)
+    assert "المستوى الثالث" in expanded
+    assert "الفرقة الثالثة" in expanded
+    assert "المقررات الدراسية" in expanded
+
+    q_digit = normalize_and_expand_query("مقررات سنه 3 في اللائحة")
+    assert "المستوى الثالث" in q_digit
+    assert "الفرقة الثالثة" in q_digit
+
+    q_prereq = normalize_and_expand_query("هل يوجد سمر كورس وما متطلب بنل 404؟")
+    assert "الفصل الدراسي الصيفي" in q_prereq
+    assert "المتطلب السابق" in q_prereq
+    assert "ROB 404" in q_prereq
+
+    q_project = normalize_and_expand_query("توزيع درجات COM 400")
+    assert "مقرر المشروع" in q_project
+
+    formal = "ما هي شروط التخرج؟"
+    assert normalize_and_expand_query(formal) == formal
+
+
+def test_retriever_diversity_and_fetch_k(tmp_path: Path) -> None:
+    chroma_dir = tmp_path / "chroma_diversity"
+    client = chromadb.PersistentClient(
+        path=str(chroma_dir),
+        settings=Settings(anonymized_telemetry=False),
+    )
+    collection = client.get_or_create_collection(
+        name="test_diversity",
+        metadata={"hnsw:space": "cosine"},
+    )
+    collection.add(
+        ids=["p010::c001", "p010::c002", "p010::c003", "p009::c001", "p012::c001"],
+        documents=[
+            "CGPA chunk 1 page 10",
+            "CGPA chunk 2 page 10",
+            "CGPA chunk 3 page 10",
+            "Warning article 17 page 9",
+            "Course repeat rules page 12",
+        ],
+        metadatas=[
+            {"source_file": "bylaws.pdf", "page_number": 10, "chunk_id": "p010::c001"},
+            {"source_file": "bylaws.pdf", "page_number": 10, "chunk_id": "p010::c002"},
+            {"source_file": "bylaws.pdf", "page_number": 10, "chunk_id": "p010::c003"},
+            {"source_file": "bylaws.pdf", "page_number": 9, "chunk_id": "p009::c001"},
+            {"source_file": "bylaws.pdf", "page_number": 12, "chunk_id": "p012::c001"},
+        ],
+        embeddings=[
+            [1.0, 0.0, 0.0, 0.0],
+            [0.98, 0.2, 0.0, 0.0],
+            [0.95, 0.3, 0.0, 0.0],
+            [0.9, 0.4, 0.0, 0.0],
+            [0.85, 0.5, 0.0, 0.0],
+        ],
+    )
+
+    seen_queries: list[str] = []
+
+    def fake_embed_fn(text: str) -> list[float]:
+        seen_queries.append(text)
+        return [1.0, 0.0, 0.0, 0.0]
+
+    retriever = ChromaRetriever(
+        chroma_dir=chroma_dir,
+        collection_name="test_diversity",
+        embed_fn=fake_embed_fn,
+    )
+
+    diverse = retriever.retrieve("ايه مواد سنه 3؟", top_k=3, fetch_k=5, max_per_page=2)
+    assert [chunk.chunk_id for chunk in diverse] == ["p010::c001", "p010::c002", "p009::c001"]
+    assert "المستوى الثالث" in seen_queries[-1]
+
+    # Backfill kicks in cleanly when top_k exceeds max_per_page * distinct_pages.
+    backfilled = retriever.retrieve(
+        "ما قواعد CGPA؟",
+        top_k=4,
+        fetch_k=5,
+        max_per_page=1,
+        expand_query=False,
+    )
+    assert seen_queries[-1] == "ما قواعد CGPA؟"
+    assert len(backfilled) == 4
+    assert backfilled[:3] == [
+        backfilled[0],
+        backfilled[1],
+        backfilled[2],
+    ]
+    assert {chunk.page_number for chunk in backfilled[:3]} == {10, 9, 12}
+
+
+def test_chunk_metadata_enrichment_for_tables_and_courses() -> None:
+    pages = [
+        PageDocument(
+            source_file="bylaws.pdf",
+            page_number=16,
+            text=(
+                "مادة (26)\n"
+                "المستوى الثالث - جدول المقررات:\n"
+                "ROB 303 | نظري 2 | عملي 2 | ساعات معتمدة 3 | المتطلب السابق COM 201"
+            ),
+        ),
+        PageDocument(
+            source_file="bylaws.pdf",
+            page_number=9,
+            text="مادة (18): توزع درجات مقرر المشروع بنسبة 50% أعمال فصلية و50% مناقشة.",
+        ),
+        PageDocument(
+            source_file="bylaws.pdf",
+            page_number=5,
+            text="يشترط للتخرج استيفاء شروط اللائحة الداخلية.",
+        ),
+    ]
+
+    chunks = chunk_documents(pages, chunk_size=500, chunk_overlap=50)
+    assert len(chunks) == 3
+
+    table_meta = chunks[0].metadata
+    assert "ROB 303" in str(table_meta["course_codes"])
+    assert "COM 201" in str(table_meta["course_codes"])
+    assert table_meta["articles"] == "26"
+    assert table_meta["academic_level"] == "Level 3"
+    assert table_meta["chunk_type"] == "table_or_curriculum"
+
+    proj_meta = chunks[1].metadata
+    assert proj_meta["articles"] == "18"
+    assert "COM 400" in str(proj_meta["course_codes"])
+    assert "COM 498" in str(proj_meta["course_codes"])
+    assert proj_meta["chunk_type"] == "table_or_curriculum"
+
+    # Plain narrative keeps only base keys and all cue values remain scalars.
+    assert set(chunks[2].metadata.keys()) == {"source_file", "page_number", "chunk_id"}
+    assert extract_chunk_metadata_cues(chunks[2].text) == {}
+    for chunk in chunks:
+        for val in chunk.metadata.values():
+            assert isinstance(val, (str, int))

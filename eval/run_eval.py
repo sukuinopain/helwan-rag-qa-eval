@@ -6,8 +6,9 @@ import argparse
 import json
 import re
 import sys
+import time
 from collections import defaultdict
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -256,11 +257,71 @@ def _clamp_unit(value: Any, default: float = 0.0) -> float:
     return round(max(0.0, min(1.0, numeric)), 4)
 
 
+_RETRYABLE_SIGNALS = (
+    "429",
+    "rate limit",
+    "rate_limit",
+    "resource_exhausted",
+    "quota",
+    "too many requests",
+    "temporarily unavailable",
+    "overloaded",
+    "503",
+    "timeout",
+    "timed out",
+    "connection reset",
+)
+_RETRY_HINT_RE = re.compile(
+    r"(?:retry\s+(?:in|after)|retrydelay['\":\s]+)\s*(\d+(?:\.\d+)?)\s*s",
+    re.IGNORECASE,
+)
+
+
+def _is_retryable_error(exc: Exception) -> bool:
+    message = str(exc).lower()
+    if any(daily in message for daily in ("perday", "per day", "daily")):
+        return False
+    return any(signal in message for signal in _RETRYABLE_SIGNALS)
+
+
+def _extract_retry_delay(exc: Exception, default_delay: float) -> float:
+    match = _RETRY_HINT_RE.search(str(exc))
+    if match:
+        hinted = float(match.group(1)) + 1.0
+        return max(1.0, min(90.0, hinted))
+    return max(1.0, min(90.0, default_delay))
+
+
+def _call_with_retry[T](
+    fn: Callable[[], T],
+    *,
+    max_retries: int = 5,
+    base_delay: float = 4.0,
+) -> T:
+    """Invoke an LLM API call with exponential backoff on transient rate-limit errors."""
+    attempt = 0
+    while True:
+        try:
+            return fn()
+        except Exception as exc:
+            if attempt >= max_retries or not _is_retryable_error(exc):
+                raise
+            delay = _extract_retry_delay(exc, base_delay * (2**attempt))
+            print(
+                f"    [retry {attempt + 1}/{max_retries}] transient rate/network limit; "
+                f"sleeping {delay:.1f}s...",
+                flush=True,
+            )
+            time.sleep(delay)
+            attempt += 1
+
+
 def evaluate_with_llm_judge(
     backend: LLMBackend,
     item: dict[str, Any],
     answer: str,
     chunks: Sequence[RetrievedChunk],
+    max_retries: int = 5,
 ) -> dict[str, Any]:
     """Score faithfulness, accuracy, and citation quality via LLM-as-a-judge JSON output."""
     abstained = detect_abstention(answer)
@@ -290,8 +351,9 @@ def evaluate_with_llm_judge(
         f"Retrieved Context:\n{context_preview}\n\n"
         f"Candidate Answer:\n{answer}\n\n"
         "Scoring criteria:\n"
-        "- If Answerable is false: faithfulness=1.0 and answer_accuracy=1.0 ONLY if Candidate "
-        "Answer clearly abstains without inventing facts; otherwise 0.0.\n"
+        "- If Answerable is false: faithfulness=1.0, answer_accuracy=1.0, and "
+        "citation_quality=1.0 ONLY if Candidate Answer clearly abstains without inventing "
+        "facts or spurious citations; otherwise 0.0.\n"
         "- If Answerable is true: faithfulness measures whether every claim is grounded in "
         "Retrieved Context; answer_accuracy measures factual completeness against Reference "
         "Answer; citation_quality measures accurate page citations matching Retrieved "
@@ -299,10 +361,13 @@ def evaluate_with_llm_judge(
     )
 
     try:
-        raw_judge = backend.generate(
-            system_prompt=system_prompt,
-            user_prompt=user_prompt,
-            temperature=0.0,
+        raw_judge = _call_with_retry(
+            lambda: backend.generate(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                temperature=0.0,
+            ),
+            max_retries=max_retries,
         )
         parsed = _parse_judge_json(raw_judge)
         return {
@@ -371,6 +436,8 @@ def run_evaluation(
     llm_model: str | None = None,
     retrieval_only: bool = False,
     judge_mode: str = "auto",
+    request_delay: float = 1.0,
+    max_retries: int = 5,
     retriever: ChromaRetriever | None = None,
     generator: RAGGenerator | None = None,
     judge_backend: LLMBackend | None = None,
@@ -387,8 +454,12 @@ def run_evaluation(
 
     active_generator = generator
     active_judge = judge_backend
+    resolved_provider: str | None = provider
+    resolved_model_name: str | None = llm_model
     if not retrieval_only and active_generator is None:
         resolved_backend = create_llm_backend(provider=provider, model=llm_model)
+        resolved_provider = resolved_backend.provider_name
+        resolved_model_name = resolved_backend.model_name
         active_generator = RAGGenerator(backend=resolved_backend)
         if judge_mode in ("auto", "llm") and active_judge is None:
             active_judge = resolved_backend
@@ -396,11 +467,14 @@ def run_evaluation(
     per_item_results: list[dict[str, Any]] = []
     by_category_records: dict[str, list[dict[str, Any]]] = defaultdict(list)
 
-    for item in items:
+    total_items = len(items)
+    for idx, item in enumerate(items, start=1):
         query = str(item["question"])
         expected_pages = [int(p) for p in item.get("expected_pages", [])]
+        expected_chunks = [str(c) for c in item.get("expected_chunks", [])]
         answerable = bool(item.get("answerable", True))
 
+        print(f"[{idx}/{total_items}] {item['id']} ({item['category']})...", flush=True)
         chunks = active_retriever.retrieve(query=query, top_k=top_k)
         retrieved_pages = [chunk.page_number for chunk in chunks]
         recall_at_k = compute_recall_at_k(retrieved_pages, expected_pages, k=top_k)
@@ -409,24 +483,27 @@ def run_evaluation(
         generation_payload: dict[str, Any] | None = None
         if not retrieval_only and active_generator is not None:
             try:
-                gen_result = active_generator.generate(query=query, chunks=chunks)
+                gen_result = _call_with_retry(
+                    lambda q=query, ch=chunks: active_generator.generate(query=q, chunks=ch),
+                    max_retries=max_retries,
+                )
+                resolved_provider = gen_result.provider
+                resolved_model_name = gen_result.model
+
                 cited_pages = [cite.page_number for cite in gen_result.citations]
                 if not cited_pages and not gen_result.abstained:
                     cited_pages = extract_cited_pages(gen_result.answer)
 
-                if judge_mode == "llm" and active_judge is not None:
+                if request_delay > 0:
+                    time.sleep(request_delay)
+
+                if judge_mode in ("auto", "llm") and active_judge is not None:
                     scores = evaluate_with_llm_judge(
                         backend=active_judge,
                         item=item,
                         answer=gen_result.answer,
                         chunks=chunks,
-                    )
-                elif judge_mode == "auto" and active_judge is not None:
-                    scores = evaluate_with_llm_judge(
-                        backend=active_judge,
-                        item=item,
-                        answer=gen_result.answer,
-                        chunks=chunks,
+                        max_retries=max_retries,
                     )
                 else:
                     scores = evaluate_with_rubric(
@@ -436,6 +513,9 @@ def run_evaluation(
                         cited_pages=cited_pages,
                         chunks=chunks,
                     )
+
+                if request_delay > 0 and idx < total_items:
+                    time.sleep(request_delay)
 
                 generation_payload = {
                     "answer": gen_result.answer,
@@ -465,8 +545,10 @@ def run_evaluation(
             "answerable": answerable,
             "question": query,
             "expected_pages": expected_pages,
+            "expected_chunks": expected_chunks,
             "retrieved_pages": retrieved_pages,
             "retrieved_chunk_ids": [chunk.chunk_id for chunk in chunks],
+            "retrieved_scores": [round(chunk.similarity, 4) for chunk in chunks],
             "top_similarity": round(chunks[0].similarity, 4) if chunks else None,
             "recall_at_k": round(recall_at_k, 4) if recall_at_k is not None else None,
             "mrr": round(mrr, 4) if mrr is not None else None,
@@ -489,6 +571,8 @@ def run_evaluation(
             "chroma_dir": str(chroma_dir),
             "collection_name": collection_name,
             "embedding_model": model_name,
+            "llm_provider": resolved_provider,
+            "llm_model": resolved_model_name,
             "top_k": top_k,
             "retrieval_only": retrieval_only,
             "judge_mode": judge_mode,
@@ -566,6 +650,18 @@ def main(argv: Sequence[str] | None = None) -> int:
         default="auto",
         help="Generation scoring mode.",
     )
+    parser.add_argument(
+        "--request-delay",
+        type=float,
+        default=1.0,
+        help="Seconds to pause between LLM API calls.",
+    )
+    parser.add_argument(
+        "--max-retries",
+        type=int,
+        default=5,
+        help="Max retries on rate limits or transient network errors.",
+    )
     args = parser.parse_args(argv)
 
     report = run_evaluation(
@@ -579,6 +675,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         llm_model=args.llm_model,
         retrieval_only=args.retrieval_only,
         judge_mode=args.judge_mode,
+        request_delay=args.request_delay,
+        max_retries=args.max_retries,
     )
     _print_summary(report)
     print(f"\nSaved detailed results to '{args.output}'.")

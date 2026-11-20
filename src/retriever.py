@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
@@ -80,6 +81,182 @@ def embed_passages(
     )
 
 
+_ARABIC_COURSE_PREFIXES: dict[str, str] = {
+    "بنل": "ROB",
+    "حسب": "COM",
+    "أسس": "BAS",
+    "اسس": "BAS",
+    "عام": "GEN",
+}
+_ARABIC_COURSE_CODE_RE = re.compile(
+    r"(?:^|[\s(\[،])(بنل|حسب|أسس|اسس|عام)\s*-?\s*(\d{3})(?!\d)"
+)
+_QUERY_EXPANSION_RULES: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
+    (
+        re.compile(
+            r"(?:سنة|سنه|الفرقة|الفرقه|فرقة|فرقه|المستوى)\s*"
+            r"(?:1|أولى|اولى|الأولى|الاولى|الأول|الاول)\b"
+            r"|\b(?:level\s*1|first\s+year|freshman)\b",
+            re.IGNORECASE,
+        ),
+        (
+            "المستوى الأول",
+            "الفرقة الأولى",
+            "الفصل الدراسي الأول",
+            "الفصل الدراسي الثاني",
+            "المقررات الدراسية",
+            "لائحة",
+        ),
+    ),
+    (
+        re.compile(
+            r"(?:سنة|سنه|الفرقة|الفرقه|فرقة|فرقه|المستوى)\s*"
+            r"(?:2|تانية|تانيه|ثانية|ثانيه|الثانية|الثانيه|الثاني|الثانى)\b"
+            r"|\b(?:level\s*2|second\s+year|sophomore)\b",
+            re.IGNORECASE,
+        ),
+        (
+            "المستوى الثاني",
+            "الفرقة الثانية",
+            "الفصل الدراسي الثالث",
+            "الفصل الدراسي الرابع",
+            "المقررات الدراسية",
+            "لائحة",
+        ),
+    ),
+    (
+        re.compile(
+            r"(?:سنة|سنه|الفرقة|الفرقه|فرقة|فرقه|المستوى)\s*"
+            r"(?:3|تالتة|تالته|ثالثة|ثالثه|الثالثة|الثالثه|الثالث)\b"
+            r"|(?:^|\s)(?:تالتة|تالته)(?=$|\s|[،,.؟?])"
+            r"|\b(?:level\s*3|third\s+year|junior)\b",
+            re.IGNORECASE,
+        ),
+        (
+            "المستوى الثالث",
+            "الفرقة الثالثة",
+            "الفصل الدراسي الخامس",
+            "الفصل الدراسي السادس",
+            "المقررات الدراسية",
+            "لائحة",
+        ),
+    ),
+    (
+        re.compile(
+            r"(?:سنة|سنه|الفرقة|الفرقه|فرقة|فرقه|المستوى)\s*"
+            r"(?:4|رابعة|رابعه|الرابعة|الرابعه|الرابع)\b"
+            r"|(?:^|\s)(?:رابعة|رابعه)(?=$|\s|[،,.؟?])"
+            r"|\b(?:level\s*4|fourth\s+year|senior)\b",
+            re.IGNORECASE,
+        ),
+        (
+            "المستوى الرابع",
+            "الفرقة الرابعة",
+            "الفصل الدراسي السابع",
+            "الفصل الدراسي الثامن",
+            "المقررات الدراسية",
+            "لائحة",
+        ),
+    ),
+    (
+        re.compile(r"(?:^|\s)(?:مواد|كورس|كورسات)(?=$|\s|[،,.؟?])"),
+        ("المقررات الدراسية", "مقررات"),
+    ),
+    (
+        re.compile(
+            r"(?:الترم\s*الصيفي|ترم\s*صيفي|السمر|سمر\s*كورس|\bsummer\s*(?:term|semester)\b)",
+            re.IGNORECASE,
+        ),
+        ("الفصل الدراسي الصيفي",),
+    ),
+    (
+        re.compile(
+            r"(?:متطلب(?:\s*سابق)?|متطلبات|بيفتح|تفتح|يفتح|\bprereq(?:uisite)?s?\b)",
+            re.IGNORECASE,
+        ),
+        ("المتطلب السابق", "متطلبات سابقة", "كود المقرر"),
+    ),
+    (
+        re.compile(
+            r"(?:مقرر\s+المشروع|مشروع\s+التخرج|\bCOM\s*400\b|\bCOM\s*498\b"
+            r"|\bgraduation\s+project\b)",
+            re.IGNORECASE,
+        ),
+        ("مقرر المشروع", "مشروع التخرج", "COM 400", "COM 498"),
+    ),
+    (
+        re.compile(r"(?:\bCGPA\b|\bGPA\b|الجي\s*بي\s*ايه|انذار|إنذار)", re.IGNORECASE),
+        ("المعدل التراكمي", "الإنذار الأكاديمي", "الساعات المعتمدة"),
+    ),
+)
+
+
+def normalize_and_expand_query(query: str) -> str:
+    """Keep the original query intact while expanding colloquial/level/alias cues."""
+    original = " ".join(query.strip().split())
+    if not original:
+        return ""
+
+    lowered = original.casefold()
+    additions: list[str] = []
+    seen: set[str] = set()
+
+    def _add_term(term: str) -> None:
+        key = term.casefold()
+        if key not in seen and key not in lowered:
+            seen.add(key)
+            additions.append(term)
+
+    for match in _ARABIC_COURSE_CODE_RE.finditer(original):
+        latin_prefix = _ARABIC_COURSE_PREFIXES[match.group(1)]
+        _add_term(f"{latin_prefix} {match.group(2)}")
+
+    for pattern, expansion_terms in _QUERY_EXPANSION_RULES:
+        if pattern.search(original):
+            for term in expansion_terms:
+                _add_term(term)
+
+    if not additions:
+        return original
+    return f"{original} ({' '.join(additions)})"
+
+
+def _select_diverse_chunks(
+    candidates: list[RetrievedChunk],
+    top_k: int,
+    max_per_page: int | None,
+) -> list[RetrievedChunk]:
+    """Select top-k chunks capping per-page duplicates before backfilling if needed."""
+    if top_k <= 0 or not candidates:
+        return []
+
+    sorted_candidates = sorted(candidates, key=lambda item: item.distance)
+    if max_per_page is None or max_per_page < 1:
+        return sorted_candidates[:top_k]
+
+    selected: list[RetrievedChunk] = []
+    selected_indices: set[int] = set()
+    page_counts: dict[tuple[str, int], int] = {}
+
+    for idx, chunk in enumerate(sorted_candidates):
+        page_key = (chunk.source_file, chunk.page_number)
+        if page_counts.get(page_key, 0) < max_per_page:
+            selected.append(chunk)
+            selected_indices.add(idx)
+            page_counts[page_key] = page_counts.get(page_key, 0) + 1
+            if len(selected) >= top_k:
+                return selected
+
+    for idx, chunk in enumerate(sorted_candidates):
+        if idx not in selected_indices:
+            selected.append(chunk)
+            selected_indices.add(idx)
+            if len(selected) >= top_k:
+                break
+
+    return selected
+
+
 def embed_query(
     query: str,
     model_name: str = DEFAULT_EMBEDDING_MODEL,
@@ -134,19 +311,34 @@ class ChromaRetriever:
         query: str,
         top_k: int = 5,
         where: dict[str, Any] | None = None,
+        fetch_k: int | None = None,
+        max_per_page: int | None = 2,
+        expand_query: bool = True,
     ) -> list[RetrievedChunk]:
-        """Return the top-k most relevant chunks with cosine distance and similarity."""
+        """Return diverse top-k chunks with cosine distance and similarity scores."""
         if not query or not query.strip():
             raise ValueError("Query must be a non-empty string.")
         if top_k < 1:
             raise ValueError("top_k must be at least 1.")
+        if fetch_k is not None and fetch_k < 1:
+            raise ValueError("fetch_k must be at least 1.")
+        if max_per_page is not None and max_per_page < 1:
+            raise ValueError("max_per_page must be at least 1.")
 
         total_chunks = self.count()
         if total_chunks == 0:
             return []
 
-        n_results = min(top_k, total_chunks)
-        query_embedding = self._embed_fn(query)
+        if fetch_k is not None:
+            requested_candidates = max(top_k, fetch_k)
+        elif max_per_page is not None:
+            requested_candidates = max(top_k * 3, top_k + 10)
+        else:
+            requested_candidates = top_k
+
+        n_results = min(requested_candidates, total_chunks)
+        effective_query = normalize_and_expand_query(query) if expand_query else query.strip()
+        query_embedding = self._embed_fn(effective_query)
 
         query_kwargs: dict[str, Any] = {
             "query_embeddings": [query_embedding],
@@ -181,8 +373,7 @@ class ChromaRetriever:
                 )
             )
 
-        results.sort(key=lambda item: item.distance)
-        return results
+        return _select_diverse_chunks(results, top_k=top_k, max_per_page=max_per_page)
 
 
 def retrieve_chunks(
@@ -191,6 +382,9 @@ def retrieve_chunks(
     chroma_dir: Path | str = DEFAULT_CHROMA_DIR,
     collection_name: str = DEFAULT_COLLECTION_NAME,
     model_name: str = DEFAULT_EMBEDDING_MODEL,
+    fetch_k: int | None = None,
+    max_per_page: int | None = 2,
+    expand_query: bool = True,
 ) -> list[RetrievedChunk]:
     """Convenience helper to query ChromaDB directly in one call."""
     retriever = ChromaRetriever(
@@ -198,7 +392,13 @@ def retrieve_chunks(
         collection_name=collection_name,
         model_name=model_name,
     )
-    return retriever.retrieve(query=query, top_k=top_k)
+    return retriever.retrieve(
+        query=query,
+        top_k=top_k,
+        fetch_k=fetch_k,
+        max_per_page=max_per_page,
+        expand_query=expand_query,
+    )
 
 
 def _configure_utf8_stdout() -> None:
@@ -213,17 +413,33 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Query Helwan regulations ChromaDB index.")
     parser.add_argument("query", help="Arabic or English search query.")
     parser.add_argument("--top-k", type=int, default=5, help="Number of chunks to return.")
+    parser.add_argument("--fetch-k", type=int, default=None, help="Candidate pool size.")
+    parser.add_argument(
+        "--max-per-page",
+        type=int,
+        default=2,
+        help="Max chunks per PDF page before backfill (0 disables cap).",
+    )
+    parser.add_argument(
+        "--no-expand",
+        action="store_true",
+        help="Disable colloquial/level query expansion.",
+    )
     parser.add_argument("--chroma-dir", default=str(DEFAULT_CHROMA_DIR), help="ChromaDB directory.")
     parser.add_argument("--collection", default=DEFAULT_COLLECTION_NAME, help="Collection name.")
     parser.add_argument("--model", default=DEFAULT_EMBEDDING_MODEL, help="Embedding model name.")
     args = parser.parse_args(argv)
 
+    max_per_page = None if args.max_per_page <= 0 else args.max_per_page
     chunks = retrieve_chunks(
         query=args.query,
         top_k=args.top_k,
         chroma_dir=args.chroma_dir,
         collection_name=args.collection,
         model_name=args.model,
+        fetch_k=args.fetch_k,
+        max_per_page=max_per_page,
+        expand_query=not args.no_expand,
     )
     print(f"Retrieved {len(chunks)} chunks for query: {args.query!r}")
     for rank, chunk in enumerate(chunks, start=1):

@@ -356,6 +356,82 @@ def load_pdfs(
     return pages, reports
 
 
+_LATIN_COURSE_CODE_RE = re.compile(r"\b(ROB|COM|BAS|GEN)\s*-?\s*(\d{3})\b", re.IGNORECASE)
+_ARABIC_COURSE_CODE_META_RE = re.compile(
+    r"(?:^|[\s(\[،])(بنل|حسب|أسس|اسس|عام)\s*-?\s*(\d{3})(?!\d)"
+)
+_ARABIC_TO_LATIN_PREFIX: dict[str, str] = {
+    "بنل": "ROB",
+    "حسب": "COM",
+    "أسس": "BAS",
+    "اسس": "BAS",
+    "عام": "GEN",
+}
+_ARTICLE_RE = re.compile(r"(?:^|[\s،.(])(?:مادة|المادة)\s*\(?\s*(\d{1,3})\s*\)?")
+_LEVEL_CUE_RULES: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"(?:المستوى\s+الأول|الفرقة\s+الأولى|\bLevel\s*1\b)", re.IGNORECASE), "Level 1"),
+    (re.compile(r"(?:المستوى\s+الثاني|الفرقة\s+الثانية|\bLevel\s*2\b)", re.IGNORECASE), "Level 2"),
+    (re.compile(r"(?:المستوى\s+الثالث|الفرقة\s+الثالثة|\bLevel\s*3\b)", re.IGNORECASE), "Level 3"),
+    (re.compile(r"(?:المستوى\s+الرابع|الفرقة\s+الرابعة|\bLevel\s*4\b)", re.IGNORECASE), "Level 4"),
+)
+_TABLE_STRUCTURE_RE = re.compile(
+    r"(?:المتطلب\s+السابق|المتطلبات\s+السابقة|كود\s+المقرر|جدول\s*\(?\d+\)?|"
+    r"توزيع\s+الدرجات|\bPrerequisite\b)"
+)
+_HOURS_SPLIT_RE = re.compile(r"(?:نظري|عملي|تمارين)")
+
+
+def extract_chunk_metadata_cues(text: str) -> dict[str, str | int]:
+    """Extract optional Chroma scalar metadata cues (courses, articles, levels, table type)."""
+    cues: dict[str, str | int] = {}
+
+    codes: list[str] = []
+    seen_codes: set[str] = set()
+    for match in _LATIN_COURSE_CODE_RE.finditer(text):
+        normalized = f"{match.group(1).upper()} {match.group(2)}"
+        if normalized not in seen_codes:
+            seen_codes.add(normalized)
+            codes.append(normalized)
+    for match in _ARABIC_COURSE_CODE_META_RE.finditer(text):
+        latin = f"{_ARABIC_TO_LATIN_PREFIX[match.group(1)]} {match.group(2)}"
+        arabic = f"{match.group(1)} {match.group(2)}"
+        for code in (arabic, latin):
+            if code not in seen_codes:
+                seen_codes.add(code)
+                codes.append(code)
+    if re.search(r"مقرر\s+المشروع|مشروع\s+التخرج", text):
+        for project_code in ("COM 400", "COM 498"):
+            if project_code not in seen_codes:
+                seen_codes.add(project_code)
+                codes.append(project_code)
+    if codes:
+        cues["course_codes"] = ", ".join(codes)
+
+    articles: list[str] = []
+    seen_articles: set[str] = set()
+    for match in _ARTICLE_RE.finditer(text):
+        num = match.group(1)
+        if num not in seen_articles:
+            seen_articles.add(num)
+            articles.append(num)
+    if articles:
+        cues["articles"] = ", ".join(articles)
+
+    levels = [label for pattern, label in _LEVEL_CUE_RULES if pattern.search(text)]
+    if levels:
+        cues["academic_level"] = ", ".join(levels)
+
+    is_table_or_curriculum = bool(
+        codes
+        or _TABLE_STRUCTURE_RE.search(text)
+        or ("ساعات معتمدة" in text and _HOURS_SPLIT_RE.search(text))
+    )
+    if is_table_or_curriculum:
+        cues["chunk_type"] = "table_or_curriculum"
+
+    return cues
+
+
 def chunk_documents(
     pages: Sequence[PageDocument],
     chunk_size: int = DEFAULT_CHUNK_SIZE,
@@ -381,15 +457,17 @@ def chunk_documents(
                 continue
             chunk_counter += 1
             chunk_id = f"{page.source_file}::p{page.page_number:03d}::c{chunk_counter:03d}"
+            metadata: dict[str, Any] = {
+                "source_file": page.source_file,
+                "page_number": int(page.page_number),
+                "chunk_id": chunk_id,
+            }
+            metadata.update(extract_chunk_metadata_cues(stripped))
             chunks.append(
                 TextChunk(
                     chunk_id=chunk_id,
                     text=stripped,
-                    metadata={
-                        "source_file": page.source_file,
-                        "page_number": int(page.page_number),
-                        "chunk_id": chunk_id,
-                    },
+                    metadata=metadata,
                 )
             )
 

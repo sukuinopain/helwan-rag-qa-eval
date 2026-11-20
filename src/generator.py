@@ -185,13 +185,20 @@ class GroqBackend:
 def create_llm_backend(
     provider: str | None = None,
     model: str | None = None,
+    *,
+    api_key: str | None = None,
+    model_name: str | None = None,
 ) -> LLMBackend:
     """Instantiate an LLM backend from explicit arguments or environment variables."""
     load_dotenv()
     selected = (provider or os.getenv("LLM_PROVIDER") or "").strip().lower()
+    resolved_model = (model_name or "").strip() or (model or "").strip() or None
+    resolved_key = (api_key or "").strip() or None
 
     if not selected or selected == "auto":
-        if (os.getenv("GEMINI_API_KEY") or "").strip():
+        if resolved_key:
+            selected = "groq" if resolved_key.startswith("gsk_") else "gemini"
+        elif (os.getenv("GEMINI_API_KEY") or "").strip():
             selected = "gemini"
         elif (os.getenv("GROQ_API_KEY") or "").strip():
             selected = "groq"
@@ -202,9 +209,9 @@ def create_llm_backend(
             )
 
     if selected == "gemini":
-        return GeminiBackend(model_name=model)
+        return GeminiBackend(api_key=resolved_key, model_name=resolved_model)
     if selected == "groq":
-        return GroqBackend(model_name=model)
+        return GroqBackend(api_key=resolved_key, model_name=resolved_model)
     raise ConfigurationError(
         f"Unsupported LLM provider '{selected}'. Supported providers: 'gemini', 'groq'."
     )
@@ -319,15 +326,23 @@ class RAGGenerator:
         provider: str | None = None,
         model: str | None = None,
         min_similarity: float | None = None,
+        *,
+        api_key: str | None = None,
+        model_name: str | None = None,
     ) -> None:
         self._backend = backend
         self._provider = provider
-        self._model = model
+        self._model = (model_name or "").strip() or (model or "").strip() or None
+        self._api_key = (api_key or "").strip() or None
         self.min_similarity = min_similarity
 
     def _get_backend(self) -> LLMBackend:
         if self._backend is None:
-            self._backend = create_llm_backend(provider=self._provider, model=self._model)
+            self._backend = create_llm_backend(
+                provider=self._provider,
+                model_name=self._model,
+                api_key=self._api_key,
+            )
         return self._backend
 
     def generate(
